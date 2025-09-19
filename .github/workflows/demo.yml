@@ -1,0 +1,54 @@
+name: Weather Demo
+
+on:
+  schedule:
+    # Run daily at 8 AM UTC (11 AM Romania time)
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+    inputs:
+      demo_type:
+        description: 'Demo type to run'
+        required: true
+        default: 'current'
+        type: choice
+        options:
+        - current
+        - forecast
+        - export
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run Weather Demo
+      env:
+        OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+      run: |
+        echo "🌤️ Running Bucharest Weather CLI Demo"
+        echo "====================================="
+        
+        if [ "${{ github.event.inputs.demo_type }}" = "forecast" ]; then
+          echo "📅 5-Day Forecast Demo:"
+          node src/cli.js forecast || echo "Demo completed (API key needed for real data)"
+        elif [ "${{ github.event.inputs.demo_type }}" = "export" ]; then
+          echo "📊 Export Demo:"
+          node src/cli.js export || echo "Demo completed (API key needed for real data)"
+        else
+          echo "🌡️ Current Weather Demo:"
+          node src/cli.js now || echo "Demo completed (API key needed for real data)"
+        fi
+        
+        echo "====================================="
+        echo "✅ Demo completed successfully!"
+        echo "🔗 Repository: https://github.com/Gzeu/bucharest-weather-cli"

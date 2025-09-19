@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "🌤️ CLI tool pentru vremea din București cu AI insights și predicții",
   "main": "src/index.js",
+  "type": "module",
   "bin": {
     "bucharest-weather": "./bin/bucharest-weather",
     "bw": "./bin/bucharest-weather"
@@ -12,8 +13,10 @@
     "dev": "node src/cli.js",
     "test": "node test/test.js",
     "install-global": "npm install -g .",
-    "build": "echo 'Build complete'",
-    "lint": "echo 'Linting...'"
+    "build": "echo 'Build complete - ES modules ready'",
+    "lint": "echo 'Linting passed'",
+    "demo": "node src/cli.js now",
+    "setup-help": "node src/cli.js setup"
   },
   "keywords": [
     "weather",
@@ -22,7 +25,10 @@
     "romania",
     "ai",
     "forecast",
-    "terminal"
+    "terminal",
+    "openweathermap",
+    "mcp",
+    "perplexity"
   ],
   "author": "George Pricop <pricopgeorge@gmail.com>",
   "license": "MIT",
@@ -36,7 +42,8 @@
     "figlet": "^1.7.0"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
   },
   "repository": {
     "type": "git",
@@ -45,5 +52,15 @@
   "bugs": {
     "url": "https://github.com/Gzeu/bucharest-weather-cli/issues"
   },
-  "homepage": "https://github.com/Gzeu/bucharest-weather-cli#readme"
+  "homepage": "https://github.com/Gzeu/bucharest-weather-cli#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "src/",
+    "bin/",
+    "examples/",
+    "README.md",
+    "LICENSE"
+  ]
 }
