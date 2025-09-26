@@ -2,6 +2,8 @@
 
 import { WeatherAPI } from './weather.js';
 import { AIInsights } from './ai-insights.js';
+import { WeatherTemplates } from './templates/weather-templates.js';
+import { TemplateConfig } from './templates/template-config.js';
 import chalk from 'chalk';
 import boxen from 'boxen';
 import figlet from 'figlet';
@@ -12,35 +14,73 @@ import fs from 'fs/promises';
 import { createObjectCsvWriter } from 'csv-writer';
 
 /**
- * Enhanced Bucharest Weather CLI Application v2.0
- * Professional weather tool with AI insights and advanced features
+ * Enhanced Bucharest Weather CLI Application v3.0
+ * Professional weather tool with advanced template system and AI insights
  */
 export class BucharestWeatherApp {
   constructor(options = {}) {
     this.weather = new WeatherAPI(options);
     this.ai = new AIInsights(options);
+    this.templates = new WeatherTemplates();
+    this.templateConfig = new TemplateConfig();
+    
     this.config = {
       showBanner: options.showBanner !== false,
       showCache: options.showCache || false,
       verboseMode: options.verbose || false,
-      language: options.language || 'ro'
+      language: options.language || 'ro',
+      useAdvancedTemplates: options.useAdvancedTemplates !== false
+    };
+  }
+
+  async init() {
+    // Initialize template configuration
+    await this.templateConfig.init();
+    
+    // Apply current theme
+    const currentTheme = this.templateConfig.getCurrentTheme();
+    this.templates.setTheme(currentTheme);
+    
+    return {
+      template: this.templateConfig.getCurrentTemplate(),
+      theme: currentTheme,
+      settings: this.templateConfig.getSettings()
     };
   }
 
   async showBanner() {
     if (!this.config.showBanner) return;
     
-    const banner = figlet.textSync('BW CLI v2', { font: 'Small' });
+    const settings = this.templateConfig.getSettings();
+    
+    if (settings.animationsEnabled) {
+      // Animated banner
+      const spinner = ora({
+        text: 'Initializing Bucharest Weather CLI...',
+        spinner: 'dots12'
+      }).start();
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      spinner.succeed('System ready!');
+    }
+    
+    const banner = figlet.textSync('BW CLI v3', { font: 'Small' });
     console.log(chalk.cyan(banner));
-    console.log(chalk.gray('🌤️  Bucharest Weather CLI v2.0.0'));
-    console.log(chalk.gray('   Professional Weather Intelligence'));
+    console.log(chalk.gray('🌤️  Bucharest Weather CLI v3.0.0'));
+    console.log(chalk.gray('   Professional Weather Intelligence with Advanced Templates'));
     console.log(chalk.gray('   Powered by MCP + Perplexity AI\n'));
   }
 
-  async getCurrentWeather(showExtended = false) {
+  async getCurrentWeather(showExtended = false, templateName = null) {
     const spinner = ora('Obțin datele meteorologice avansate...').start();
     
     try {
+      // Initialize template system if not done
+      if (!templateName) {
+        await this.init();
+        templateName = this.templateConfig.getCurrentTemplate();
+      }
+      
       // Fetch all weather data in parallel
       const [currentData, airQuality, uvIndex] = await Promise.allSettled([
         this.weather.getCurrent(),
@@ -57,8 +97,19 @@ export class BucharestWeatherApp {
       // Generate AI insights
       const insights = await this.ai.generateInsights(current, null, air, uv);
       
-      // Display current weather
-      await this.displayCurrentWeather(current, insights, air, uv, showExtended);
+      // Use advanced template system if enabled
+      if (this.config.useAdvancedTemplates) {
+        const templateOutput = this.templates.renderTemplate(
+          templateName,
+          current,
+          null,
+          insights
+        );
+        console.log('\n' + templateOutput);
+      } else {
+        // Fallback to original display method
+        await this.displayCurrentWeatherFallback(current, insights, air, uv, showExtended);
+      }
       
       return { current, air, uv, insights };
       
@@ -68,15 +119,83 @@ export class BucharestWeatherApp {
       
       // Fallback to mock data if API fails
       if (error.message.includes('API key')) {
-        console.log(chalk.yellow('\n📝 Folosesc date demo:'));
+        console.log(chalk.yellow('\n📋 Folosesc date demo:'));
         const mockData = this.weather.getMockData();
         const mockInsights = await this.ai.generateInsights(mockData);
-        await this.displayCurrentWeather(mockData, mockInsights, null, null, showExtended);
+        
+        if (this.config.useAdvancedTemplates) {
+          const templateOutput = this.templates.renderTemplate(
+            templateName || 'classic',
+            mockData,
+            null,
+            mockInsights
+          );
+          console.log('\n' + templateOutput);
+        } else {
+          await this.displayCurrentWeatherFallback(mockData, mockInsights, null, null, showExtended);
+        }
       }
     }
   }
 
-  async displayCurrentWeather(data, insights, airQuality, uvIndex, showExtended) {
+  async getForecast(days = 5, showHourly = false, templateName = null) {
+    const spinner = ora(`Obțin prognoza pentru ${days} zile...`).start();
+    
+    try {
+      // Initialize template system if not done
+      if (!templateName) {
+        await this.init();
+        templateName = this.templateConfig.getCurrentTemplate();
+      }
+      
+      const forecast = await this.weather.getForecast(days);
+      const current = await this.weather.getCurrent();
+      const insights = await this.ai.generateInsights(current, forecast);
+      
+      spinner.succeed('Prognoza obținută cu succes!');
+      
+      // Use advanced template system if enabled
+      if (this.config.useAdvancedTemplates) {
+        const templateOutput = this.templates.renderTemplate(
+          templateName,
+          current,
+          forecast,
+          insights
+        );
+        console.log('\n' + templateOutput);
+      } else {
+        // Fallback to original display method
+        await this.displayForecastFallback(forecast, days, showHourly);
+      }
+      
+      return forecast;
+      
+    } catch (error) {
+      spinner.fail('Eroare la obținerea prognozei');
+      console.error(chalk.red('❌ Eroare prognoză:', error.message));
+      
+      // Fallback to mock data
+      const mockForecast = this.weather.getMockForecast(days);
+      console.log(chalk.yellow('\n📋 Folosesc prognoza demo:'));
+      
+      if (this.config.useAdvancedTemplates) {
+        const mockCurrent = this.weather.getMockData();
+        const mockInsights = await this.ai.generateInsights(mockCurrent, mockForecast);
+        const templateOutput = this.templates.renderTemplate(
+          templateName || 'dashboard',
+          mockCurrent,
+          mockForecast,
+          mockInsights
+        );
+        console.log('\n' + templateOutput);
+      } else {
+        await this.displayForecastFallback(mockForecast, days, showHourly);
+      }
+    }
+  }
+
+  // Fallback display methods for backward compatibility
+  async displayCurrentWeatherFallback(data, insights, airQuality, uvIndex, showExtended) {
     const timestamp = new Date().toLocaleString('ro-RO');
     const cacheIndicator = data.fromCache ? chalk.yellow(' [Cache]') : '';
     
@@ -101,24 +220,6 @@ export class BucharestWeatherApp {
       mainInfo.push(`${chalk.white('Zăpadă:')} ${data.snow_1h || 0} mm/h, ${data.snow_3h || 0} mm/3h`);
     }
     
-    // Extended info section
-    if (showExtended) {
-      mainInfo.push('', chalk.bold.cyan('📈 DETALII AVANSATE:'));
-      
-      if (airQuality) {
-        mainInfo.push(`${chalk.green('Calitatea aerului:')} ${airQuality.aqi_description} (AQI: ${airQuality.aqi})`);
-        mainInfo.push(`${chalk.gray('PM2.5:')} ${airQuality.pm2_5} μg/m³ | ${chalk.gray('PM10:')} ${airQuality.pm10} μg/m³`);
-      }
-      
-      if (uvIndex) {
-        mainInfo.push(`${chalk.yellow('Indice UV:')} ${uvIndex.uv_index} (${uvIndex.uv_description})`);
-      }
-      
-      if (data.temp_min !== data.temp_max) {
-        mainInfo.push(`${chalk.cyan('Interval:')} ${data.temp_min}°C - ${data.temp_max}°C`);
-      }
-    }
-    
     console.log(boxen(mainInfo.join('\n'), {
       padding: 1,
       margin: 1,
@@ -132,7 +233,36 @@ export class BucharestWeatherApp {
     await this.displayAIInsights(insights);
     
     // Smart alerts
-    await this.displaySmartAlerts(insights.alerts);
+    if (insights.alerts && insights.alerts.length > 0) {
+      await this.displaySmartAlerts(insights.alerts);
+    }
+  }
+
+  async displayForecastFallback(forecast, days, showHourly) {
+    console.log(chalk.bold.blue(`\n📅 PROGNOZA ${days} ZILE - BUCUREȘTI`));
+    console.log(chalk.gray('─'.repeat(60)));
+    
+    forecast.forEach((day, index) => {
+      const dayName = index === 0 ? 'Astăzi' : 
+                     index === 1 ? 'Mâine' : day.dayName;
+      
+      const tempRange = `${day.temp_min}°C - ${day.temp_max}°C`;
+      const avgTemp = day.temp_avg ? ` (med: ${day.temp_avg}°C)` : '';
+      
+      console.log(chalk.yellow(`\n📆 ${dayName} (${day.date}):`));
+      console.log(`   ${chalk.cyan('Temperaturi:')} ${tempRange}${avgTemp}`);
+      console.log(`   ${chalk.green('Descriere:')} ${day.description}`);
+      
+      if (day.humidity_avg) {
+        console.log(`   ${chalk.blue('Umiditate:')} ${day.humidity_avg}% | ${chalk.magenta('Vânt:')} ${day.wind_speed_avg} m/s`);
+      }
+      
+      if (day.precipitation_total > 0) {
+        console.log(`   ${chalk.cyan('Precipitații:')} ${day.precipitation_total} mm`);
+      }
+    });
+    
+    console.log(chalk.gray('\n' + '─'.repeat(60)));
   }
 
   async displayAIInsights(insights) {
@@ -175,99 +305,6 @@ export class BucharestWeatherApp {
     }));
   }
 
-  async getForecast(days = 5, showHourly = false) {
-    const spinner = ora(`Obțin prognoza pentru ${days} zile...`).start();
-    
-    try {
-      const forecast = await this.weather.getForecast(days);
-      spinner.succeed('Prognoza obținută cu succes!');
-      
-      await this.displayForecast(forecast, days, showHourly);
-      return forecast;
-      
-    } catch (error) {
-      spinner.fail('Eroare la obținerea prognozei');
-      console.error(chalk.red('❌ Eroare prognoză:', error.message));
-      
-      // Fallback to mock data
-      const mockForecast = this.weather.getMockForecast(days);
-      console.log(chalk.yellow('\n📝 Folosesc prognoza demo:'));
-      await this.displayForecast(mockForecast, days, showHourly);
-    }
-  }
-
-  async displayForecast(forecast, days, showHourly) {
-    console.log(chalk.bold.blue(`\n📅 PROGNOZA ${days} ZILE - BUCUREȘTI`));
-    console.log(chalk.gray('─'.repeat(60)));
-    
-    forecast.forEach((day, index) => {
-      const dayName = index === 0 ? 'Astăzi' : 
-                     index === 1 ? 'Mâine' : day.dayName;
-      
-      const tempRange = `${day.temp_min}°C - ${day.temp_max}°C`;
-      const avgTemp = day.temp_avg ? ` (med: ${day.temp_avg}°C)` : '';
-      
-      console.log(chalk.yellow(`\n📆 ${dayName} (${day.date}):`))
-      console.log(`   ${chalk.cyan('Temperaturi:')} ${tempRange}${avgTemp}`);
-      console.log(`   ${chalk.green('Descriere:')} ${day.description}`);
-      
-      if (day.humidity_avg) {
-        console.log(`   ${chalk.blue('Umiditate:')} ${day.humidity_avg}% | ${chalk.magenta('Vânt:')} ${day.wind_speed_avg} m/s`);
-      }
-      
-      if (day.precipitation_total > 0) {
-        console.log(`   ${chalk.cyan('Precipitații:')} ${day.precipitation_total} mm`);
-      }
-      
-      // Show hourly breakdown for today and tomorrow if requested
-      if (showHourly && index < 2 && day.hourly) {
-        console.log(chalk.gray('   Detalii orare:'));
-        day.hourly.slice(0, 8).forEach(hour => {
-          console.log(chalk.gray(`     ${hour.time}: ${hour.temp}°C ${hour.description}`));
-        });
-      }
-    });
-    
-    console.log(chalk.gray('\n' + '─'.repeat(60)));
-  }
-
-  async displayForecastTable(forecast) {
-    const data = [
-      ['Zi', 'Data', 'Min', 'Max', 'Descriere', 'Umiditate', 'Vânt']
-    ];
-    
-    forecast.forEach((day, index) => {
-      const dayName = index === 0 ? 'Astăzi' : index === 1 ? 'Mâine' : day.dayName;
-      data.push([
-        dayName,
-        day.date,
-        `${day.temp_min}°C`,
-        `${day.temp_max}°C`,
-        day.description,
-        `${day.humidity_avg || 'N/A'}%`,
-        `${day.wind_speed_avg || 'N/A'} m/s`
-      ]);
-    });
-    
-    const config = {
-      border: {
-        topBody: '─',
-        topJoin: '┬',
-        topLeft: '┌',
-        topRight: '┐',
-        bottomBody: '─',
-        bottomJoin: '┴',
-        bottomLeft: '└',
-        bottomRight: '┘',
-        bodyLeft: '│',
-        bodyRight: '│',
-        bodyJoin: '│'
-      }
-    };
-    
-    console.log('\n' + table(data, config));
-  }
-
   async exportData(format = 'json', filename = null) {
     const spinner = ora('Exportă datele meteo...').start();
     
@@ -276,6 +313,7 @@ export class BucharestWeatherApp {
       const forecast = await this.weather.getForecast(7);
       const airQuality = await this.weather.getAirQuality().catch(() => null);
       const uvIndex = await this.weather.getUVIndex().catch(() => null);
+      const insights = await this.ai.generateInsights(current, forecast, airQuality, uvIndex);
       
       const data = {
         timestamp: new Date().toISOString(),
@@ -285,10 +323,13 @@ export class BucharestWeatherApp {
         forecast,
         airQuality,
         uvIndex,
+        insights,
         metadata: {
-          apiVersion: '2.0',
+          apiVersion: '3.0',
           source: 'OpenWeatherMap',
-          generatedBy: 'Bucharest Weather CLI v2.0.0'
+          generatedBy: 'Bucharest Weather CLI v3.0.0',
+          template: this.templateConfig?.getCurrentTemplate() || 'classic',
+          theme: this.templateConfig?.getCurrentTheme() || 'default'
         }
       };
       
@@ -324,7 +365,9 @@ export class BucharestWeatherApp {
             visibility: current.visibility,
             cloudiness: current.cloudiness,
             air_quality: airQuality ? airQuality.aqi_description : 'N/A',
-            uv_index: uvIndex ? uvIndex.uv_index : 'N/A'
+            uv_index: uvIndex ? uvIndex.uv_index : 'N/A',
+            template: data.metadata.template,
+            theme: data.metadata.theme
           }
         ];
         
@@ -357,20 +400,33 @@ export class BucharestWeatherApp {
   async showSystemInfo() {
     const cacheStats = this.weather.getCacheStats();
     const aiMetrics = this.ai.getPerformanceMetrics();
+    const templateInfo = await this.getTemplateSystemInfo();
     
     const systemInfo = [
       chalk.bold.cyan('📊 SISTEM INFO:'),
       '',
-      `${chalk.yellow('Versiune:')} v2.0.0`,
+      `${chalk.yellow('Versiune:')} v3.0.0`,
       `${chalk.green('Cache activ:')} ${cacheStats.keys.length} chei`,
       `${chalk.blue('AI Engine:')} v${aiMetrics.algorithmVersion}`,
-      `${chalk.magenta('Acuratețe AI:')} ${aiMetrics.accuracy}`,
+      `${chalk.magenta('Acurațețe AI:')} ${aiMetrics.accuracy}`,
       `${chalk.cyan('Timp răspuns:')} ${aiMetrics.responseTime}`,
+      '',
+      chalk.bold.cyan('🎨 TEMPLATE SYSTEM:'),
+      `${chalk.yellow('Template activ:')} ${templateInfo.currentTemplate}`,
+      `${chalk.yellow('Temă activă:')} ${templateInfo.currentTheme}`,
+      `${chalk.green('Template-uri disponibile:')} ${templateInfo.totalTemplates}`,
+      `${chalk.green('Teme disponibile:')} ${templateInfo.totalThemes}`,
       '',
       `${chalk.gray('Features:')}`
     ];
     
+    // Add AI features
     aiMetrics.features.forEach(feature => {
+      systemInfo.push(chalk.gray(`  ✓ ${feature}`));
+    });
+    
+    // Add template features
+    templateInfo.features.forEach(feature => {
       systemInfo.push(chalk.gray(`  ✓ ${feature}`));
     });
     
@@ -382,6 +438,74 @@ export class BucharestWeatherApp {
       title: '📊 SYSTEM STATUS',
       titleAlignment: 'center'
     }));
+  }
+
+  async getTemplateSystemInfo() {
+    const availableTemplates = this.templates.getAvailableTemplates();
+    const availableThemes = this.templates.getAvailableThemes();
+    
+    return {
+      currentTemplate: this.templateConfig?.getCurrentTemplate() || 'classic',
+      currentTheme: this.templateConfig?.getCurrentTheme() || 'default',
+      totalTemplates: availableTemplates.length,
+      totalThemes: availableThemes.length,
+      features: [
+        '10+ Visual Templates',
+        '8 Color Themes',
+        'Interactive Configuration',
+        'Preset Management',
+        'Export/Import Settings',
+        'Real-time Preview',
+        'Custom Template Support'
+      ]
+    };
+  }
+
+  // Render weather with specific template
+  async renderWithTemplate(templateName, themeName = null, options = {}) {
+    await this.init();
+    
+    if (themeName) {
+      this.templates.setTheme(themeName);
+    }
+    
+    const weatherData = await this.weather.getCurrent();
+    const insights = await this.ai.generateInsights(weatherData);
+    
+    let forecast = null;
+    if (options.includeForecast) {
+      forecast = await this.weather.getForecast(options.forecastDays || 5);
+    }
+    
+    const output = this.templates.renderTemplate(
+      templateName,
+      weatherData,
+      forecast,
+      insights
+    );
+    
+    return output;
+  }
+
+  // Template management methods
+  async setTemplate(templateName) {
+    return await this.templateConfig.setTemplate(templateName);
+  }
+
+  async setTheme(themeName) {
+    const success = await this.templateConfig.setTheme(themeName);
+    if (success) {
+      this.templates.setTheme(themeName);
+    }
+    return success;
+  }
+
+  getAvailableTemplates() {
+    return this.templates.getAvailableTemplates();
+  }
+
+  getAvailableThemes() {
+    return this.templates.getAvailableThemes();
   }
 
   // Helper methods
@@ -430,8 +554,13 @@ export class BucharestWeatherApp {
 
 // Direct execution for testing
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const app = new BucharestWeatherApp();
+  const app = new BucharestWeatherApp({
+    useAdvancedTemplates: true
+  });
+  
   await app.showBanner();
+  await app.init();
   await app.getCurrentWeather(true);
+  console.log('\n' + '='.repeat(80) + '\n');
   await app.getForecast(5);
 }
