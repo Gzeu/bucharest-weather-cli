@@ -1,5 +1,5 @@
 {
-  "name": "bucharest-weather-cli",
+  "name": "@gzeu/bucharest-weather-cli",
   "version": "3.0.0",
   "description": "🌤️ Professional weather CLI for Bucharest with advanced template system, AI insights, forecasts, and enterprise-grade meteorological intelligence - 2025 Edition",
   "main": "src/index.js",
@@ -20,7 +20,7 @@
     "test:e2e": "node test/e2e.js",
     "test:templates": "node examples/template-showcase.js --performance",
     "install-global": "npm install -g .",
-    "uninstall-global": "npm uninstall -g bucharest-weather-cli",
+    "uninstall-global": "npm uninstall -g @gzeu/bucharest-weather-cli",
     "lint": "eslint src bin --ext .js,.ts",
     "lint:fix": "eslint src bin --ext .js,.ts --fix",
     "format": "prettier --write \"**/*.{js,ts,json,md,yml}\"",
@@ -37,7 +37,11 @@
     "quick-setup": "node src/cli.js welcome && node src/cli.js config",
     "template-gallery": "node src/cli.js templates --gallery",
     "theme-gallery": "node src/cli.js theme --gallery",
-    "publish-npm": "npm publish --access public",
+    "publish-npm": "npm publish --registry https://registry.npmjs.org/ --access public",
+    "publish-github": "npm publish --registry https://npm.pkg.github.com --access public",
+    "publish-both": "npm run publish-npm && npm run publish-github",
+    "pre-publish": "npm run build && npm run test && npm version patch",
+    "deploy": "npm run pre-publish && npm run publish-both",
     "benchmark": "node benchmark/speed.js",
     "benchmark:ai": "node benchmark/ai-performance.js",
     "benchmark:templates": "node examples/template-showcase.js --performance",
@@ -85,7 +89,9 @@
     "predictions",
     "alerts",
     "customization",
-    "2025"
+    "2025",
+    "github-packages",
+    "npm-registry"
   ],
   "author": {
     "name": "George Pricop",
@@ -158,7 +164,7 @@
   "homepage": "https://github.com/Gzeu/bucharest-weather-cli#readme",
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://npm.pkg.github.com"
   },
   "files": [
     "src/",
@@ -167,7 +173,8 @@
     "docs/",
     "README.md",
     "LICENSE",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    ".npmrc"
   ],
   "funding": {
     "type": "github",
