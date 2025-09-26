@@ -357,6 +357,35 @@ await config.setTemplate('dashboard');
 await config.setTheme('cyberpunk');
 ```
 
+## 📦 Demo și Showcase
+
+### Template Showcase
+```bash
+# Demo toate template-urile disponibile
+node examples/template-showcase.js --templates
+
+# Demo toate temele de culori
+node examples/template-showcase.js --themes
+
+# Demo combinații template+temă
+node examples/template-showcase.js --combinations
+
+# Interactive showcase
+node examples/template-showcase.js --interactive
+
+# Quick demo cu best templates
+node examples/template-showcase.js
+```
+
+### Performance Testing
+```bash
+# Test viteza tuturor template-urilor
+node examples/template-showcase.js --performance
+
+# Test și benchmark system
+npm run benchmark
+```
+
 ## 📎 Roadmap v3.1+
 
 ### Next Features
@@ -387,22 +416,10 @@ Template-urile sunt deschise pentru contribuții!
 ### Contribuie Teme Noi
 1. Adaugă tema în `themes` object
 2. Testează cu toate template-urile
-3. Documentațievb noul tema
+3. Documentație pentru noua temă
 4. Submit PR cu screenshots
 
-## 📜 Documentație Completă
-
-- **[API Documentation](./docs/api.md)**
-- **[Template Development Guide](./docs/template-guide.md)**
-- **[Theme Creation Tutorial](./docs/theme-tutorial.md)**
-- **[Configuration Reference](./docs/config-reference.md)**
-- **[Troubleshooting Guide](./docs/troubleshooting.md)**
-
-## 📝 License
-
-**MIT License** - Liber de folosit pentru proiecte comerciale și personale.
-
-## 👏 Credits
+## 👏 Credits & Mulțumiri
 
 - **🎆 Powered by**: OpenWeatherMap API pentru date meteorologice precise
 - **🚀 Built with**: Modern Node.js ecosystem și best practices
