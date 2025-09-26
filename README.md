@@ -1,26 +1,29 @@
-# 🌤️ Bucharest Weather CLI
+# 🌤️ Bucharest Weather CLI v3.0
 
-**Tool profesional pentru vremea din București cu inteligentă artificială și predicții avansate**
+**Tool profesional pentru vremea din București cu sistem avansat de template-uri vizuale și inteligență artificială**
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Node](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg)
-![Quality](https://img.shields.io/badge/code%20quality-professional-success.svg)
+[![GitHub license](https://img.shields.io/github/license/Gzeu/bucharest-weather-cli)](https://github.com/Gzeu/bucharest-weather-cli/blob/main/LICENSE)
+[![npm version](https://badge.fury.io/js/bucharest-weather-cli.svg)](https://badge.fury.io/js/bucharest-weather-cli)
+[![Node.js CI](https://github.com/Gzeu/bucharest-weather-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/Gzeu/bucharest-weather-cli/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/Gzeu/bucharest-weather-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/Gzeu/bucharest-weather-cli)
 
-## ✨ Features
+## ✨ Ce e nou în v3.0
 
-- ☁️ **Vremea actuală** cu detalii meteorologice complete pentru București
-- 📅 **Prognoza pe 5 zile** cu temperaturi min/max și condiții atmosferice
-- 🤖 **AI Recommendations** pentru îmbrăcăminte, activități și planificare
-- 🚨 **Smart Alerts** pentru condiții meteorologice extreme
-- 📊 **Export date** în JSON/CSV pentru analize și integrări
-- ⚡ **CLI ultra-rapid** cu comenzi scurte și eficiente
-- 🎨 **Interface modern** cu styling colorat și iconițe intuitive
-- 🔄 **Auto-refresh** și cache pentru performanță optimă
+### 🎨 **Sistem Avansat de Template-uri**
+- **10+ Template-uri Vizuale**: Classic, Modern Cards, Dashboard, Minimal, ASCII Art, Retro Terminal, Weather Map, Mobile Style, Matrix, Gauge Meters
+- **8 Teme de Culori**: Default, Dark, Ocean, Forest, Sunset, Cyberpunk, Minimal, Rainbow
+- **Configurare Interactivă**: Setup GUI prin CLI pentru personalizare completă
+- **Preset-uri Personalizate**: Salvează și aplica configurații pentru diferite scenarii
+- **Export/Import Setări**: Partajează configurațiile cu echipa ta
 
-## 🚀 Instalare și Setup
+### 🤖 **AI și Inteligentă Avansată**
+- **Recomandări Contextuale**: AI adaptează sfaturile la condițiile meteorologice
+- **Predicii Predictive**: Analize avansate pentru planificare zilnică
+- **Alerte Inteligente**: Notificări personalizate pentru condiții extreme
 
-### Metoda Recomandată (Git Clone)
+## 🚀 Quick Start
+
+### Instalare Rapidă
 ```bash
 # Clone repository
 git clone https://github.com/Gzeu/bucharest-weather-cli.git
@@ -29,268 +32,414 @@ cd bucharest-weather-cli
 # Install dependencies
 npm install
 
-# Setup configurație (gratuit)
+# Setup API key
 cp .env.example .env
-# Editează .env cu API key de la openweathermap.org
+# Edit .env cu API key de la openweathermap.org
 
-# Test funcționalitate
+# Test și demo
 npm run demo
 ```
 
-### Instalare Globală (NPM)
+### Comenzi Esențiale
 ```bash
-# Coming soon to NPM registry
-npm install -g bucharest-weather-cli
+# Vremea actuală cu template-ul activ
 bw now
+
+# Configurare interactivă (RECOMANDAT pentru început)
+bw config
+
+# Explorează template-urile disponibile
+bw templates --gallery
+
+# Schimbă tema de culori
+bw theme ocean
+
+# Demo toate template-urile
+bw demo --templates
+
+# Quick switch template
+bw quick
 ```
 
-## 🔑 Configurare API Key
+## 🎨 Template-uri Disponibile
 
-### Pasul 1: Obține API Key Gratuit
-1. Acceseasă [OpenWeatherMap API](https://openweathermap.org/api)
-2. Creează cont gratuit (2 minute)
-3. Obține API key instant
-4. Configurează în `.env`:
-
-```env
-# Required: OpenWeatherMap API Key
-OPENWEATHER_API_KEY=your_api_key_here
-
-# Optional: Custom settings
-WEATHER_CITY=Bucharest
-WEATHER_COUNTRY=RO
-REFRESH_INTERVAL=300
-```
-
-### Pasul 2: Verifică Setup
+### 1. **Classic Professional** (`classic`)
+Template elegant cu design tradițional și borduri profesionale.
 ```bash
-node src/cli.js setup
-bw --version
+bw now --template classic
 ```
 
-## 💻 Utilizare Avansată
-
-### Comenzi Principale
-
+### 2. **Modern Cards** (`modern`)
+Layout cu carduri moderne, perfect pentru utilizatori contemporani.
 ```bash
-# Vremea curentă cu AI insights
-node src/cli.js now
-bw current                # alias
-
-# Prognoza extinsă
-node src/cli.js forecast
-bw f --days 3             # 3 zile specifice
-bw f -d 7                 # maxim 7 zile
-
-# Export și analiză
-node src/cli.js export --format json
-bw export -f csv > weather_data.csv
-
-# Ajutor și configurare
-node src/cli.js setup
-bw help
-bw --version
+bw now --template modern
 ```
 
-### Comenzi Avansate
-
+### 3. **Terminal Dashboard** (`dashboard`)
+Dashboard complet cu tabele, grafice și indicații detaliate.
 ```bash
-# Monitor continuu
-watch -n 300 'bw now'     # Refresh la 5 minute
-
-# Pipeline cu alte tools
-bw export -f json | jq '.current.temp'
-bw current | grep "Temperatură" | cut -d: -f2
-
-# Integrări cu scripturi
-bw export -f json | curl -X POST -d @- your-webhook-url
+bw now --template dashboard
 ```
 
-## 📊 Exemple de Output
-
-### Current Weather (Enhanced)
-```
-╭───────────────────────────────────────────────╮
-│                                               │
-│   🌡️  VREMEA ACUM ÎN BUCUREȘTI              │
-│   19 septembrie 2025, 03:45 EEST             │
-│                                               │
-│   Temperatură: 22°C (simte ca 24°C)          │
-│   Descriere: parțial înnorat                 │
-│   Umiditate: 65% | Presiune: 1013 hPa        │
-│   Vânt: 3.2 m/s NE | Vizibilitate: 10 km    │
-│   Răsărit: 06:45 | Apus: 19:30             │
-│                                               │
-│   🤖 AI RECOMANDĂRI PERSONALIZATE:           │
-│   👔 Îmbrăcăminte: Cămașă subțire + jachetă   │
-│   🎯 Activitate ideală: Cycling în Herastrau  │
-│   📈 Trend: Temperaturi stabile următoarele ore │
-│   ✅ Condiții optime pentru activități outdoor  │
-│                                               │
-╰───────────────────────────────────────────────╯
-```
-
-### Extended Forecast
-```
-📅 PROGNOZA EXTINSĂ 7 ZILE - BUCUREȘTI
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🗓️  Astăzi (Vineri):     18°C - 25°C    ☁️ parțial înnorat
-     📍 Ideal pentru: plimbări, terase, cycling
-
-🗓️  Mâine (Sâmbătă):   16°C - 23°C    🌦️ ploaie ușoară
-     📍 Recomandare: activități indoor, muzee
-
-🗓️  Duminică:          14°C - 20°C    ☁️ înnorat
-     📍 Bun pentru: cafenele, shopping mall-uri
-```
-
-## 🔧 Arhitectură Tehnică
-
-### Stack Tehnologic
-- **Runtime**: Node.js 16+ cu ES Modules native
-- **CLI Framework**: Commander.js pentru parsing și help
-- **HTTP Client**: Axios cu retry logic și timeout
-- **Styling**: Chalk (colors) + Boxen (borders) + Figlet (ASCII art)
-- **API Integration**: OpenWeatherMap REST API v2.5
-- **AI Engine**: Logic proprietar pentru recomandări contextuale
-- **Testing**: Suite de teste automate cu coverage
-- **CI/CD**: GitHub Actions pentru Node 16/18/20
-
-### Structura Modulara
-```
-bucharest-weather-cli/
-├── src/                    # Core application logic
-│   ├── index.js            # Main application entry
-│   ├── cli.js              # Command-line interface
-│   ├── weather.js          # OpenWeatherMap API client
-│   └── ai-insights.js      # AI recommendation engine
-├── bin/                    # Executable binaries
-│   └── bucharest-weather   # Global CLI executable
-├── test/                   # Test suite
-│   └── test.js             # Automated test cases
-├── examples/               # Usage documentation
-│   └── usage.md            # Detailed examples
-├── .github/workflows/      # CI/CD automation
-│   ├── ci.yml              # Testing pipeline
-│   └── demo.yml            # Demo automation
-└── docs/                   # Project documentation
-```
-
-## 🧪 Quality Assurance
-
-### Testing
+### 4. **Minimal Clean** (`minimal`)
+Design minimalist pentru utilizatori care prefer simplitatea.
 ```bash
-# Suite completă de teste
-npm test
-
-# Coverage report
-npm run test:coverage
-
-# Performance testing
-npm run test:performance
-
-# Manual testing
-npm run dev
-node test/test.js
+bw now --template minimal
 ```
 
-### CI/CD Pipeline
-- **✅ Automated Testing** pe Node.js 16, 18, 20
-- **✅ Security Scanning** cu npm audit
-- **✅ Code Quality** checks
-- **✅ Cross-platform** compatibility (Linux, macOS, Windows)
+### 5. **ASCII Art Weather** (`ascii`)
+Ilustrații artistice în terminal cu arte ASCII personalizate.
+```bash
+bw now --template ascii
+```
 
-## 🚀 Roadmap și Extensii
+### 6. **Retro Terminal** (`retro`)
+Stil vintage anii 80-90 cu efecte retro și culori clasice.
+```bash
+bw now --template retro
+```
 
-### Version 1.1 (Current Development)
-- [ ] **Multiple Cities Support** - Cluj, Timișoara, Iași
-- [ ] **Advanced AI Integration** - Groq API pentru predicții ML
-- [ ] **Weather Alerts** - Desktop notifications pentru extreme
-- [ ] **Historical Data** - Analiză trendinds pe 30 zile
+### 7. **Weather Map** (`map`)
+Hartă vizuală a Bucureștiului cu indicații geografice.
+```bash
+bw now --template map
+```
 
-### Version 1.2 (Planning)
-- [ ] **Web Dashboard** - Express.js server cu real-time data
-- [ ] **Docker Container** - Containerized deployment
-- [ ] **Webhook Support** - Integrări cu Slack, Discord, Teams
-- [ ] **Weather Maps** - ASCII art maps în terminal
+### 8. **Mobile Style** (`mobile`)
+Design inspirat din aplicațiile mobile moderne.
+```bash
+bw now --template mobile
+```
 
-### Version 2.0 (Future)
-- [ ] **Multi-language Support** - English, French, German
-- [ ] **Weather API Aggregation** - Multiple data sources
-- [ ] **Machine Learning** - Custom prediction models
-- [ ] **Mobile App** - React Native companion
+### 9. **Matrix Code** (`matrix`)
+Efecte Matrix cu cod digital și animatii futuriste.
+```bash
+bw now --template matrix
+```
 
-## 💬 Developer API
+### 10. **Gauge Meters** (`gauge`)
+Indicatori vizuali tip gauge pentru toate datele meteorologice.
+```bash
+bw now --template gauge
+```
 
-### Core Classes
+## 🎨 Teme de Culori
 
-#### WeatherAPI
+| Temă | Descriere | Exemplu Utilizare |
+|--------|-----------|-------------------|
+| `default` | Albastru/Cyan clasic | `bw theme default` |
+| `dark` | Temă întunecată minimală | `bw theme dark` |
+| `ocean` | Nuanțe de albastru ocean | `bw theme ocean` |
+| `forest` | Verde natural pădure | `bw theme forest` |
+| `sunset` | Portocaliu/Roșu apus | `bw theme sunset` |
+| `cyberpunk` | Magenta/Cyan futurist | `bw theme cyberpunk` |
+| `minimal` | Doar alb/gri simplu | `bw theme minimal` |
+| `rainbow` | Culori multicolore | `bw theme rainbow` |
+
+## ⚙️ Configurare Avansată
+
+### Setup Interactiv
+```bash
+bw config
+```
+Această comandă lansează un GUI interactiv pentru:
+- Alegerea template-ului preferat
+- Selectarea temei de culori
+- Configurarea setărilor avansate
+- Personalizarea experienței CLI
+
+### Managementul Preset-urilor
+```bash
+# Listă preset-uri disponibile
+bw preset --list
+
+# Aplică preset pentru dezvoltatori
+bw preset developer
+
+# Creează preset personalizat
+bw preset --create my-preset
+
+# Preset-uri built-in:
+# - developer: Dashboard + Cyberpunk + cache info
+# - casual: Modern + Default + animații
+# - minimal_user: Minimal + Minimal + compact
+# - artistic: ASCII + Rainbow + efecte
+```
+
+### Export/Import Configurații
+```bash
+# Exportă setările actuale
+bw config --export my-config.json
+
+# Importă configurații
+bw config --import my-config.json
+
+# Reset la default
+bw config --reset
+```
+
+## 📊 Features Avansate
+
+### Template Cu Prognoze
+```bash
+# Prognoza cu template specific
+bw forecast --template dashboard --days 7
+
+# Combină template + temă
+bw forecast --template modern --theme ocean --days 5
+```
+
+### Preview și Demo
+```bash
+# Preview template fără API call
+bw templates --preview modern
+
+# Demo toate template-urile
+bw demo --templates
+
+# Demo toate temele
+bw demo --themes
+```
+
+### Export Date cu Template Info
+```bash
+# Export cu metadata template
+bw export --format json --output data.json
+# Include: template actual, temă, timestamp, etc.
+
+# Export CSV cu info complet
+bw export --format csv --output data.csv
+```
+
+## 💻 Comenzi Complete CLI
+
+### Comenzi Esențiale
+```bash
+bw now                    # Vremea actuală cu template activ
+bw forecast              # Prognoza cu template activ
+bw templates             # Management template-uri
+bw theme [name]          # Management teme
+bw config                # Configurare interactivă
+bw quick                 # Quick switch template
+bw preset [name]         # Management preset-uri
+bw demo                  # Demo și showcase
+bw export                # Export date
+bw info                  # System info
+bw welcome              # Banner și features
+```
+
+### Opțiuni Avansate
+```bash
+# Template și temă specifică
+bw now --template modern --theme ocean
+
+# Forecast cu zile personalizate
+bw forecast --days 10 --template dashboard
+
+# Verbose mode cu detalii system
+bw now --verbose
+
+# Template preview
+bw templates --preview ascii
+
+# Lista template-uri
+bw templates --list
+
+# Galerie completă
+bw templates --gallery
+```
+
+## 🔧 Personalizare Avansată
+
+### Customizing Templates
+Fiecare template poate fi personalizat prin:
+```bash
+# Customize template clasic
+bw config
+# → Alege "Customize Template"
+# → Modifică border style, padding, culori
+```
+
+### Creați Template-uri Custom
+Puteți adăuga template-uri personalizate în:
+```
+~/.bucharest-weather-cli/custom-templates/
+```
+
+### Setări Config File
+Configurația se salvează în:
+```
+~/.bucharest-weather-cli/template-config.json
+```
+
+## 📈 Performance și Cacheing
+
+- **Smart Caching**: Cache inteligent pentru API calls
+- **Template Caching**: Template-urile se încarcă o singură dată
+- **Lazy Loading**: Încărcare la cerere pentru performance optim
+- **Async Rendering**: Rendering asincron pentru template-uri complexe
+
+## 🐞 Debugging și Troubleshooting
+
+### Debugging Template-uri
+```bash
+# Verbose mode pentru debugging
+bw now --verbose
+
+# Check system info
+bw info
+
+# Test cu date mock (fără API)
+bw demo --templates
+```
+
+### Common Issues
+1. **Template nu se încarcă**: Verificați `bw config --show`
+2. **Culori nu apar**: Terminal-ul trebuie să suporte culori
+3. **Cache issues**: `bw config --reset` pentru reset complet
+
+## 🔥 Exemple de Utilizare
+
+### Pentru Dezvoltatori
+```bash
+# Setup pentru dezvoltatori
+bw preset developer
+bw now --verbose  # Vezi info cache și performance
+```
+
+### Pentru Utilizatori Casnici
+```bash
+# Setup casual cu animații
+bw preset casual
+bw forecast --days 3
+```
+
+### Pentru Terminale Minimale
+```bash
+# Setup minimal fără efecte
+bw preset minimal_user
+bw now  # Output curat, rapid
+```
+
+### Pentru Fun și Artistic
+```bash
+# Setup artistic cu efecte
+bw preset artistic
+bw now  # ASCII art + rainbow colors
+```
+
+## 📚 API și Integrare
+
+### Weather Templates API
 ```javascript
-import { WeatherAPI } from './src/weather.js';
+import { WeatherTemplates } from './src/templates/weather-templates.js';
 
-const weather = new WeatherAPI({
-  apiKey: 'your-key',
-  city: 'Bucharest',
-  units: 'metric',
-  language: 'ro'
-});
+const templates = new WeatherTemplates();
+templates.setTheme('ocean');
 
-// Get current conditions
-const current = await weather.getCurrent();
-
-// Get extended forecast
-const forecast = await weather.getForecast(7);
-
-// Get historical data
-const history = await weather.getHistorical(30);
+const output = templates.renderTemplate(
+  'modern', 
+  weatherData, 
+  forecastData, 
+  aiInsights
+);
 ```
 
-#### AIInsights
+### Template Config API
 ```javascript
-import { AIInsights } from './src/ai-insights.js';
+import { TemplateConfig } from './src/templates/template-config.js';
 
-const ai = new AIInsights();
+const config = new TemplateConfig();
+await config.init();
 
-// Generate personalized recommendations
-const insights = await ai.generateInsights(weatherData);
-
-// Get clothing advice
-const clothing = ai.getClothingAdvice(temperature, conditions);
-
-// Activity suggestions
-const activities = ai.getActivitySuggestions(weather, time);
+// Programmatic configuration
+await config.setTemplate('dashboard');
+await config.setTheme('cyberpunk');
 ```
 
-## 🐛 Support și Community
+## 📦 Demo și Showcase
 
-### Official Channels
-- **🐛 Bug Reports**: [GitHub Issues](https://github.com/Gzeu/bucharest-weather-cli/issues)
-- **💡 Feature Requests**: [GitHub Discussions](https://github.com/Gzeu/bucharest-weather-cli/discussions)
-- **📬 Direct Contact**: pricopgeorge@gmail.com
-- **💬 Community**: Join our Discord server (coming soon)
+### Template Showcase
+```bash
+# Demo toate template-urile disponibile
+node examples/template-showcase.js --templates
 
-### Contributing Guidelines
-1. **Fork** repository-ul pe GitHub
-2. **Create branch** pentru feature (`git checkout -b feature/awesome-feature`)
-3. **Implement** cu teste și documentație
-4. **Test** pe multiple Node.js versions
-5. **Submit** Pull Request cu descriere detaliată
+# Demo toate temele de culori
+node examples/template-showcase.js --themes
 
-## 📜 Licență și Credits
+# Demo combinații template+temă
+node examples/template-showcase.js --combinations
 
-### Open Source License
-**MIT License** - Liber de folosit pentru proiecte comerciale și personale.  
-Vezi [LICENSE](LICENSE) pentru termeni completi.
+# Interactive showcase
+node examples/template-showcase.js --interactive
 
-### Credits și Mulțumiri
+# Quick demo cu best templates
+node examples/template-showcase.js
+```
+
+### Performance Testing
+```bash
+# Test viteza tuturor template-urilor
+node examples/template-showcase.js --performance
+
+# Test și benchmark system
+npm run benchmark
+```
+
+## 📎 Roadmap v3.1+
+
+### Next Features
+- [ ] **Custom Template Builder**: GUI pentru creare template-uri
+- [ ] **Weather Widgets**: Template-uri pentru desktop widgets
+- [ ] **Terminal Themes**: Import teme din popular terminal themes
+- [ ] **Animation System**: Animații și tranziții avansate
+- [ ] **Voice Commands**: Control vocal pentru schimbare template
+- [ ] **Mobile Companion**: Sincronizare cu aplicația mobilă
+
+### Template Extensions
+- [ ] **3D Weather Models**: Modele 3D ASCII pentru condiții meteo
+- [ ] **Interactive Maps**: Hărți interactive cu zoom și pan
+- [ ] **Weather Animations**: Animații pentru ploaie, zăpadă, etc.
+- [ ] **Social Features**: Partajare template-uri în comunitate
+
+## 🤝 Contribuții
+
+Template-urile sunt deschise pentru contribuții!
+
+### Contribuie Template-uri Noi
+1. Fork repository-ul
+2. Creează template în `src/templates/weather-templates.js`
+3. Adaugă documentație și exemple
+4. Testează cu `bw demo --templates`
+5. Submit Pull Request
+
+### Contribuie Teme Noi
+1. Adaugă tema în `themes` object
+2. Testează cu toate template-urile
+3. Documentație pentru noua temă
+4. Submit PR cu screenshots
+
+## 👏 Credits & Mulțumiri
+
 - **🎆 Powered by**: OpenWeatherMap API pentru date meteorologice precise
 - **🚀 Built with**: Modern Node.js ecosystem și best practices
 - **🇷🇴 Made in**: Bucharest, Romania cu ❤️ pentru comunitatea tech locală
-- **💫 Inspired by**: Nevoile zilnice ale dezvoltatorilor și tech enthusiasts
+- **💫 Inspired by**: Modern CLI tools și needs ale dezvoltatorilor
 
 ---
 
-### 🌟 **Professional Weather Intelligence pentru București** 🌟
+## 🌟 **Professional Weather Intelligence cu Style pentru București** 🌟
 
-*Tool-ul preferat al dezvoltatorilor români pentru vremea din capitală.*
+*Tool-ul preferat al dezvoltatorilor români pentru vremea din capitală - acum cu template-uri vizuale avansate!*
+
+**Demo Live**: 
+```bash
+git clone https://github.com/Gzeu/bucharest-weather-cli.git
+cd bucharest-weather-cli && npm install && npm run demo
+```
+
+**Quick Links**:
+- 🐛 [Report Issues](https://github.com/Gzeu/bucharest-weather-cli/issues)
+- 💬 [Discussions](https://github.com/Gzeu/bucharest-weather-cli/discussions) 
+- ⭐ [Star on GitHub](https://github.com/Gzeu/bucharest-weather-cli)
+- 📨 [Email Support](mailto:pricopgeorge@gmail.com)
